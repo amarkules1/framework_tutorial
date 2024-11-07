@@ -5,6 +5,7 @@ screen_width = 1500
 screen_height = 800
 check_point = ((1200, 660), (1250, 120), (190, 200), (1030, 270), (250, 475), (650, 690))
 
+
 class Car:
     def __init__(self, car_file, map_file, pos):
         self.surface = pygame.image.load(car_file)
@@ -66,7 +67,6 @@ class Car:
         dist = int(math.sqrt(math.pow(x - self.center[0], 2) + math.pow(y - self.center[1], 2)))
         self.radars.append([(x, y), dist])
 
-
     def check_radar_for_draw(self, degree):
         len = 0
         x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * len)
@@ -123,21 +123,27 @@ class Car:
         # caculate 4 collision points
         self.center = [int(self.pos[0]) + 50, int(self.pos[1]) + 50]
         len = 40
-        left_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 30))) * len, self.center[1] + math.sin(math.radians(360 - (self.angle + 30))) * len]
-        right_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 150))) * len, self.center[1] + math.sin(math.radians(360 - (self.angle + 150))) * len]
-        left_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 210))) * len, self.center[1] + math.sin(math.radians(360 - (self.angle + 210))) * len]
-        right_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 330))) * len, self.center[1] + math.sin(math.radians(360 - (self.angle + 330))) * len]
+        left_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 30))) * len,
+                    self.center[1] + math.sin(math.radians(360 - (self.angle + 30))) * len]
+        right_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 150))) * len,
+                     self.center[1] + math.sin(math.radians(360 - (self.angle + 150))) * len]
+        left_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 210))) * len,
+                       self.center[1] + math.sin(math.radians(360 - (self.angle + 210))) * len]
+        right_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 330))) * len,
+                        self.center[1] + math.sin(math.radians(360 - (self.angle + 330))) * len]
         self.four_points = [left_top, right_top, left_bottom, right_bottom]
 
+
 class PyGame2D:
-    def __init__(self):
+    def __init__(self, mode=0):
         pygame.init()
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("Arial", 30)
-        self.car = Car('car.png', 'map.png', [700, 650])
+        self.map_file = 'map.png' if mode == 0 else 'map-black.png'
+        self.car = Car('car.png', self.map_file, [700, 650])
         self.game_speed = 60
-        self.mode = 0
+        self.mode = mode
 
     def action(self, action):
         if action == 0:
@@ -194,13 +200,9 @@ class PyGame2D:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
                     self.mode += 1
-                    self.mode = self.mode % 3
+                    self.mode = self.mode % 2
 
         self.screen.blit(self.car.map, (0, 0))
-
-
-        if self.mode == 1:
-            self.screen.fill((0, 0, 0))
 
         self.car.radars_for_draw.clear()
         for d in range(-90, 120, 45):
@@ -211,20 +213,18 @@ class PyGame2D:
         self.car.draw_radar(self.screen)
         self.car.draw(self.screen)
 
-
         text = self.font.render("Press 'm' to change view mode", True, (255, 255, 0))
         text_rect = text.get_rect()
-        text_rect.center = (screen_width/2, 100)
+        text_rect.center = (screen_width / 2, 100)
         self.screen.blit(text, text_rect)
-
-
 
         pygame.display.flip()
         self.clock.tick(self.game_speed)
 
 
 def get_distance(p1, p2):
-	return math.sqrt(math.pow((p1[0] - p2[0]), 2) + math.pow((p1[1] - p2[1]), 2))
+    return math.sqrt(math.pow((p1[0] - p2[0]), 2) + math.pow((p1[1] - p2[1]), 2))
+
 
 def rot_center(image, angle):
     orig_rect = image.get_rect()

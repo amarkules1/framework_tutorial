@@ -3,8 +3,9 @@ import numpy as np
 import math
 import random
 
-import gym
+import gymnasium as gym
 import gym_game
+
 
 def simulate():
     global epsilon, epsilon_decay
@@ -24,7 +25,7 @@ def simulate():
                 action = np.argmax(q_table[state])
 
             # Do action and get result
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, done, truncated, _ = env.step(action)
             total_reward += reward
 
             # Get correspond q value from state, action pair
